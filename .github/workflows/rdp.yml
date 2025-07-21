@@ -14,9 +14,7 @@ jobs:
     - name: Setup Tailscale
       uses: tailscale/github-action@v2
       with:
-        oauthClientId: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-        oauthClientSecret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
-        oauthToken: ${{ secrets.TAILSCALE_AUTHKEY }}
+        authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
         tags: tag:ci-github-actions
 
     - name: Enable RDP and Set Password
