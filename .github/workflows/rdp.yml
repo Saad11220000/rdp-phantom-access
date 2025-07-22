@@ -22,10 +22,14 @@ jobs:
         # Wait for installation to complete
         Start-Sleep -Seconds 10
         
-        # Connect to Tailscale using auth key
+        # Try to connect to Tailscale using auth key
         & "C:\Program Files\Tailscale\tailscale.exe" up --authkey="${{ secrets.TAILSCALE_AUTHKEY }}" --accept-routes
         
-        # Get Tailscale IP
+        # Get Tailscale status and bugreport for diagnostics
+        & "C:\Program Files\Tailscale\tailscale.exe" status
+        & "C:\Program Files\Tailscale\tailscale.exe" bugreport
+        
+        # Get Tailscale IP (will be empty if not connected)
         $tailscaleIP = & "C:\Program Files\Tailscale\tailscale.exe" ip -4
         Write-Host "Tailscale IP: $tailscaleIP"
       shell: pwsh
