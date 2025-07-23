@@ -22,11 +22,18 @@ jobs:
         # Wait for installation to complete
         Start-Sleep -Seconds 10
         
-        # Try to connect to Tailscale using auth key
-        & "C:\Program Files\Tailscale\tailscale.exe" up --authkey="${{ secrets.TAILSCALE_AUTHKEY }}" --accept-routes
+        # Verify Tailscale installation path
+        Get-ChildItem -Path "C:\Program Files\Tailscale\tailscale.exe" -ErrorAction SilentlyContinue | Out-Null
+        if (-not $?) {
+            Write-Error "Tailscale executable not found at C:\Program Files\Tailscale\tailscale.exe"
+            exit 1
+        }
+
+        # Try to connect to Tailscale using auth key with debug logging
+        & "C:\Program Files\Tailscale\tailscale.exe" up --authkey="${{ secrets.TAILSCALE_AUTHKEY }}" --accept-routes --debug
         
         # Get Tailscale status and bugreport for diagnostics
-        & "C:\Program Files\Tailscale\tailscale.exe" status
+        & "C:\Program Files\Tailscale\tailscale.exe" status --json
         & "C:\Program Files\Tailscale\tailscale.exe" bugreport
         
         # Get Tailscale IP (will be empty if not connected)
