@@ -29,9 +29,18 @@ jobs:
             exit 1
         }
 
-        # Try to connect to Tailscale using auth key with debug logging
-        & "C:\Program Files\Tailscale\tailscale.exe" up --authkey="${{ secrets.TAILSCALE_AUTHKEY }}" --accept-routes --debug
+        # Attempt to connect to Tailscale and get login URL
+        $tailscaleLoginOutput = & "C:\Program Files\Tailscale\tailscale.exe" up --authkey="${{ secrets.TAILSCALE_AUTHKEY }}" --accept-routes --login-server=https://control.tailscale.com --json
+        Write-Host "Tailscale Login Output: $tailscaleLoginOutput"
         
+        # Extract and display the login URL if available
+        $loginURL = ($tailscaleLoginOutput | ConvertFrom-Json).AuthURL
+        if ($loginURL) {
+            Write-Host "Please visit this URL to authorize the device: $loginURL"
+        } else {
+            Write-Host "No login URL found. Tailscale might have connected automatically or encountered an error."
+        }
+
         # Get Tailscale status and bugreport for diagnostics
         & "C:\Program Files\Tailscale\tailscale.exe" status --json
         & "C:\Program Files\Tailscale\tailscale.exe" bugreport
